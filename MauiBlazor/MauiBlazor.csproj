@@ -64,7 +64,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\MauiWebview\APIClient\ApiClient.csproj" />
+      <ProjectReference Include="..\APIClient\ApiClient.csproj" />
     </ItemGroup>
 
 </Project>
