@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ApiClient.Models.ApiModels;
 
 namespace WebAPI.Database
 {
@@ -16,12 +17,13 @@ namespace WebAPI.Database
         {
             // Connect to SQL with connection string from app settings
             options.UseSqlServer(ConnectionString);
-    }
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Supervisor> Supervisors { get; set; }
         public DbSet<Project> Projects { get; set; }
-        public DbSet<Session> Sessions { get; set; }
+
+        public DbSet<Application> Applications { get; set; }
     }
 }

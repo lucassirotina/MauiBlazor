@@ -1,6 +1,7 @@
 ﻿//using WebAPI.Database;
 
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
 
 namespace MauiBlazor.Models;
 
@@ -13,6 +14,16 @@ public class HomeModel
 
     [Required]
     public int UserId { get; set; }
+
+    // PBKDF2 Hash-Algorithmus
+    public static string Hash(string password, string salt)
+    {
+        using (var algorithm = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 500000))
+        {
+            var hash = algorithm.GetBytes(256 / 8);
+            return Convert.ToBase64String(hash);
+        }
+    }
 }
 
 //public class ProjectViewModel

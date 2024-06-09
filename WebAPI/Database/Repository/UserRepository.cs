@@ -1,75 +1,76 @@
-﻿namespace WebAPI.Database.Repository
+﻿using ApiClient.Models.ApiModels;
+
+namespace WebAPI.Database.Repository;
+
+public interface IUserRepository
 {
-    public interface IUserRepository
+    public User GetUserById(int id);
+    public User GetUserByEmail(string Email);
+    public void CreateUser(User user);
+    public void DeleteUser(User user);
+    public IDictionary<string, string> LoadUserFromDB();
+    public List<User> GetAllUser();
+    public User GetUserByName(string userName);
+    public bool UserExists(string userName);
+    public bool EmailExists(string email);
+}
+
+public class UserRepository : IUserRepository
+{
+    private DataContext context;
+
+    public UserRepository(DataContext context)
     {
-        public User GetUserById(int id);
-        public User GetUserByEmail(string Email);
-        public void CreateUser(User user);
-        public void DeleteUser(User user);
-        public IDictionary<string, string> LoadUserFromDB();
-        public List<User> GetAllUser();
-        public User GetUserByName(string userName);
-        public bool UserExists(string userName);
-        public bool EmailExists(string email);
+        this.context = context;
     }
 
-    public class UserRepository : IUserRepository
+    public User GetUserById(int id)
     {
-        private DataContext context;
+        return context.Users.Find(id);
+    }
 
-        public UserRepository(DataContext context)
-        {
-            this.context = context;
-        }
+    public User GetUserByName(string userName)
+    {
+        return context.Users.FirstOrDefault(x => x.UserName == userName);
+    }
+    
+    public User GetUserByEmail(string email)
+    {
+        return context.Users.FirstOrDefault(x => x.Email == email);
+    }
 
-        public User GetUserById(int id)
-        {
-            return context.Users.Find(id);
-        }
+    public bool UserExists(string userName)
+    {
+        return context.Users.Any(x => x.UserName == userName);
+    }
+    
+    public bool EmailExists(string email)
+    {
+        return context.Users.Any(x => x.Email == email);
+    }
 
-        public User GetUserByName(string userName)
-        {
-            return context.Users.FirstOrDefault(x => x.UserName == userName);
-        }
-        
-        public User GetUserByEmail(string email)
-        {
-            return context.Users.FirstOrDefault(x => x.Email == email);
-        }
+    public void CreateUser(User user)
+    {
+        context.Users.Add(user);
+    }
 
-        public bool UserExists(string userName)
-        {
-            return context.Users.Any(x => x.UserName == userName);
-        }
-        
-        public bool EmailExists(string email)
-        {
-            return context.Users.Any(x => x.Email == email);
-        }
+    public void DeleteUser(User user)
+    {
+        context.Users.Remove(user);
+    }
 
-        public void CreateUser(User user)
-        {
-            context.Users.Add(user);
-        }
+    public List<User> GetAllUser()
+    {
+        return context.Users.ToList();
+    }
 
-        public void DeleteUser(User user)
+    public IDictionary<string, string> LoadUserFromDB()
+    {
+        IDictionary<string, string> User = new Dictionary<string, string>();
+        foreach (User user in context.Users)
         {
-            context.Users.Remove(user);
+            User[user.UserName] = user.Password;
         }
-
-        public List<User> GetAllUser()
-        {
-            return context.Users.ToList();
-        }
-
-        public IDictionary<string, string> LoadUserFromDB()
-        {
-            IDictionary<string, string> User = new Dictionary<string, string>();
-            foreach (User user in context.Users)
-            {
-                User[user.UserName] = user.Password;
-            }
-            return User;
-        }
+        return User;
     }
 }

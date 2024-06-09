@@ -7,38 +7,55 @@ public class Project
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int ProjektId { get; set; }
-
-    public string ProjektName { get; set; }
-
-    public string ProjektBeschreibung { get; set; }
-
-    public bool ProjektStatus { get; set; }
-
-    public DateTime? ProjektStart { get; set; }
-
-    public DateTime? ProjektEnde { get; set; }
+    public int ProjectId { get; set; }
+    public string ProjectName { get; set; }
+    public string ProjectDescription { get; set; }
+    public string? ProjectRequirements { get; set; }
+    public int SecondSupervisorId { get; set; }
+    public bool ProjectStatus { get; set; }
+    public DateTime? ProjectBeginn { get; set; }
+    public int? ProjectDuration { get; set; }
+    public string? ProjectLocation { get; set; }
+    public string? AdditionalInfo { get; set; }
+    public string? PossibleProjects { get; set; }
+    public string? Semester { get; set; }
+    public string Degree { get; set; }
+    public string Language { get; set; }
+    public DateTime? ProjectEnd { get; set; }
 
     [ForeignKey("Supervisor")]
-    public int PrüferId { get; set; }
+    public int SupervisorId { get; set; }
 
     [ForeignKey("Student")]
     public int StudentId { get; set; }
+    public float? Grade { get; set; }
+    public string ProjectType { get; set; }
+    public string Faculty { get; set; }
 
-    public string? Note { get; set; }
+    public Project()
+    {
+    }
 
-    //public Project() { }
+    public Project(string projectName, string projectDescription, DateTime? projectBeginn, int? projectDuration,
+                       string? additionalInfo, string? possibleProjects, string degree, string language, string? requirements,
+                       string? projectLocation, int supervisorId, int secondSupervisorId, string projectType, string? semester, string faculty)
 
-    //public Project(int projektId, string projektName, string projektBeschreibung, bool projektStatus, int prüferId, int studentId, string note)
-    //{
-    //    ProjektId = projektId;
-    //    ProjektName = projektName;
-    //    ProjektBeschreibung = projektBeschreibung;
-    //    ProjektStatus = projektStatus;
-    //    ProjektStart = null;
-    //    ProjektEnde = null;
-    //    PrüferId = prüferId;
-    //    StudentId = studentId;
-    //    Note = note;
-    //}
+    {
+        ProjectName = projectName;
+        ProjectDescription = projectDescription;
+        ProjectStatus = false;
+        ProjectBeginn = projectBeginn;
+        ProjectDuration = projectDuration;
+        AdditionalInfo = additionalInfo;
+        PossibleProjects = possibleProjects;
+        Degree = degree;
+        Language = language;
+        ProjectRequirements = requirements;
+        ProjectLocation = projectLocation;
+        SupervisorId = supervisorId;
+        SecondSupervisorId = secondSupervisorId;
+        ProjectType = projectType;
+        Semester = semester;
+        Faculty = faculty;
+    }
 }

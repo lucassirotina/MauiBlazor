@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
-using WebAPI.Database.Repository;
+using WebMVC.Database.Repository;
 
-namespace WebAPI.Database
+namespace WebMVC.Database
 {
     public class Session
     {
@@ -53,6 +53,7 @@ namespace WebAPI.Database
 
             return key;
         }
+
 
         public static bool IsValid(string sessionKey)
         {

@@ -1,25 +1,33 @@
-﻿//using ApiClient.Database;
+﻿namespace ApiClient.Models;
 
-namespace ApiClient.Models;
-
-public class HomeModel
+public class HomeViewModel
 {
-    public string Username { get; set; }
-    public string? Password { get; set; }
-    public int UserId { get; set; }
-    public HomeModel(string username, int userId)
+    public List<UserModel> Users { get; set; }
+
+    public HomeViewModel(List<UserModel> users)
     {
-        Username = username;
-        UserId = userId;
+        Users = users;
     }
 }
 
-//public class ProjectViewModel
-//{
+public class ProjectViewModel
+{
+    public List<ProjectModel> Projects { get; set; }
 
-//    public List<ProjectModel> Projects { get; set; }
-//    public ProjectViewModel(List<ProjectModel> projects)
-//    {
-//        Projects = projects;
-//    }
-//}
+    public ProjectViewModel(List<ProjectModel> projects)
+    {
+        Projects = projects;
+    }
+}
+
+public class UserViewModel
+{
+    public List<SupervisorModel> Supervisors { get; set; }
+    public List<UserModel> Users { get; set; }
+
+    public UserViewModel(List<SupervisorModel> supervisors, List<UserModel> users)
+    {
+        Supervisors = supervisors;
+        Users = users;
+    }
+}
