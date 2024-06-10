@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpLogging;
 using ApiClient.Models.ApiModels;
 using System.Net.Http;
+using ApiClient.Models;
 
 namespace WebAPI.Controllers;
 
@@ -17,14 +18,14 @@ namespace WebAPI.Controllers;
 public class HomeController : Controller
 {
     private readonly DataContext _dataContext;
-    private readonly HttpClient? _httpClient;
-    private readonly ILogger<HomeController> _logger;
+    //private readonly HttpClient? _httpClient;
+    //private readonly ILogger<HomeController> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public HomeController(ILogger<HomeController> logger, IHttpContextAccessor httpContextAccessor, DataContext dataContext)
+    public HomeController(/*ILogger<HomeController> logger,*/ IHttpContextAccessor httpContextAccessor, DataContext dataContext)
     {
         _dataContext = dataContext;
-        _logger = logger;
+        //_logger = logger;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -46,8 +47,12 @@ public class HomeController : Controller
 
 
     [HttpPost("Login")]
-    public IActionResult Anmeldung(int UserId, string password)
+    [Consumes("application/json")]
+    public IActionResult Anmeldung([FromBody] HomeModel homeModel)
     {
+        int UserId = homeModel.UserId;
+        string password = homeModel.Password;
+
         if (password == "" || UserId == null)
         {
             //ViewBag.ErrorMessage = "Bitte Passwort und User ID eingeben!";
@@ -78,9 +83,8 @@ public class HomeController : Controller
                 if (userId.Role == "teacher")
                     return RedirectToAction("GetAllProjects", "Project", new { userId = userId.UserId });
             }
-
-            //ViewBag.ErrorMessage = "Ungültige User ID oder Passwort!";
-            return BadRequest();
+            
+            return BadRequest("Ungültige User ID oder Passwort!");
             //return View("Login");
         }
     }

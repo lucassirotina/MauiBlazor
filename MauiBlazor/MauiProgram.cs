@@ -18,6 +18,7 @@ namespace MauiBlazor
 			builder.Services.AddMauiBlazorWebView();
             builder.Services.AddApiClientService(x => x.BaseAddress = "http://10.0.2.2:5172/");
             builder.Services.AddTransient<MainPage>();
+            builder.Services.AddSingleton<Services.AppData>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
