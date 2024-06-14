@@ -11,12 +11,11 @@ namespace WebAPI.Controllers;
 public class ProjectController : Controller
 {
     private readonly DataContext _dataContext;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProjectController(DataContext dataContext, IHttpContextAccessor httpContextAccessor) 
+    public ProjectController(DataContext dataContext)
     {
         _dataContext = dataContext;
-        _httpContextAccessor = httpContextAccessor;
+
     }
 
     [Route("GetProjects")]
@@ -26,17 +25,15 @@ public class ProjectController : Controller
         return await _dataContext.Projects.ToListAsync();
     }
 
-    [Route("GetAllProjects")]
+    [Route("GetAllProjects{userId}")]
     [HttpGet]
-    //Die Themen werden den Studierenden und Lehrenden basiert auf ihre Fakultät gezeigt 
-    public ActionResult<List<ProjectModel>> GetAllProjects()
+    // Die Themen werden den Studierenden und Lehrenden basiert auf ihre Fakultät gezeigt.
+    public ActionResult<List<ProjectModel>> GetAllProjects(string UserId)
     {
-        var UserId = _httpContextAccessor.HttpContext.Session.GetInt32("UserId");
-        var UserRole = _httpContextAccessor.HttpContext.Session.GetString("UserRole");
-
+        int userId = Convert.ToInt32(UserId);
         using (UnitOfWork unitOfWork = new UnitOfWork())
         {
-            var user = unitOfWork.UserRepository.GetUserById(UserId.Value);
+            var user = unitOfWork.UserRepository.GetUserById(userId);
             var student = unitOfWork.StudentRepository.GetUserById(user.UserId);
             var supervisor = unitOfWork.LehrenderRepository.GetUserById(user.UserId);
             string? faculty = null;

@@ -1,14 +1,318 @@
 ﻿@page "/feed"
-
 @using ApiClient.Models
 @using Services
-@inject Services.AppData appData
+@using MauiBlazor.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@inject ApiClient.ApiClientService ApiService
+@inject AuthenticationStateProvider authStateProvider
+@inject Services.AppData AppDataService
 
+<div class="container">
+            <div class="container" id="test1">
+                <div class="content-wrapper">
+                    <div class="row">
+                        <!-- 1. Zeile, zwei Grids -->
+                        <div class="col-lg-6 col-md-6 col-sm-12" style="margin-bottom: 10px;">
+                            <div class="card" style="min-height: 300px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">News-Themen</h5>
+                                    <div class="col-md-6">
+                                        <div class="rounded overflow-hidden mb-3" style="width: 290px; height: 220px; margin-left: 0px;  background-color: black;">
+                                            <img src="Images/logo.png" class="w-100 h-auto" alt="Logo" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12" style="margin-bottom: 10px;">
+                            <div class="card" style="min-height: 300px;">
+                                <div class="card-body">
+                                    <h5 class="card-title">Aktuelle Forschungsteams</h5>
+                                    <p class="card-text">Hier werden aktuelle Forschungsteams chronologisch vorgestellt. <a href="https://www.google.de" target="_blank">Weitere Informationen</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+    <div class="row">
+        <!-- 2. Zeile, ein Grid -->
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Filteroptionen</h5>
+                    <!-- Dropdowns für Filteroptionen -->
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="selectAbschlussgrad">Abschlussgrad</label>
+                                <select class="form-control" id="selectAbschlussgrad">
+                                    <option value="Bachelor of Arts">Bachelor of Arts</option>
+                                    <option value="Bachelor of Science">Bachelor of Science</option>
+                                    <option value="Bachelor of Engineering">Bachelor of Engineering</option>
+                                    <option value="Bachelor of Business Administration">Bachelor of Business Administration</option>
+                                    <option value="Bachelor of Fine Arts">Bachelor of Fine Arts </option>
+                                    <option value="Bachelor of Laws">Bachelor of Laws </option>
+                                    <option value="Bachelor of Education">Bachelor of Education</option>
+                                    <option value="Bachelor of Medicine, Bachelor of Surgery">Bachelor of Medicine, Bachelor of Surgery</option>
+                                    <option value="Bachelor of Dental Surgery">Bachelor of Dental Surgery</option>
+                                    <option value="Master of Arts">Master of Arts (M.A.)</option>
+                                    <option value="Master of Science">Master of Science (M.Sc.)</option>
+                                    <option value="Master of Engineering">Master of Engineering (M.Eng.)</option>
+                                    <option value="Master of Business Administration">Master of Business Administration (MBA)</option>
+                                    <option value="Master of Fine Arts">Master of Fine Arts (MFA)</option>
+                                    <option value="Master of Laws">Master of Laws (LL.M.)</option>
+                                    <option value="Master of Education">Master of Education (M.Ed.)</option>
+                                    <option value="Master of Public Health">Master of Public Health (MPH)</option>
+                                    <option value="Master of Social Work">Master of Social Work (MSW)</option>
+                                    <option value="Master of Public Administration">Master of Public Administration (MPA)</option>
+                                    <option value="Master of Public Policy">Master of Public Policy (MPP)</option>
+                                    <option value="Master of Architecture">Master of Architecture (M.Arch.)</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="selectErstpruefer">Erstprüfer</label>
+                                <select class="form-control" id="selectErstprüfer">
+                                    @foreach (var item in projectlist)
+                                    {
+                                        <option value="@item.SupervisorName">@item.SupervisorName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="additionalFilters" style="display: none;">
+                        <div class="row mt-3">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="selectZweitpruefer">Zweitprüfer</label>
+                                    <select class="form-control" id="selectZweitpruefer">
+                                        @foreach (var item in projectlist)
+                                        {
+                                            <option value="@item.SecondSupervisor">@item.SecondSupervisor</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="selectSemester">Semester</label>
+                                    <select class="form-control" id="selectSemester">
+                                        <option value="beliebig">Beliebig</option>
+                                        <option value="Sommersemester">Sommersemester</option>
+                                        <option value="Wintersemester">Wintersemester</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="selectSprache">Sprache</label>
+                                    <select class="form-control" id="selectSprache">
+                                        <option value="Beliebig">Beliebig</option>
+                                        <option value="Deutsch">Deutsch</option>
+                                        <option value="Englisch">Englisch</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="selectArt">Art der Arbeit</label>
+                                    <select class="form-control" id="selectArt">
+                                        <option value="Beliebig">Beliebig</option>
+                                        <option value="Empirische Studie">Empirische Studie</option>
+                                        <option value="Literatur Recherche">Literatur Recherche</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="forschungsProjekt">Forschungsprojekt</label>
+                                    <select class="form-control" id="forschungsProjekt">
+                                        <option value="forschungBeliebig">Beliebig</option>
+                                        <option value="forschungsProjekt1">Forschungsprojekt XY</option>
+                                        <option value="forschungsProjekt2">Forschungsprojekt YX</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Filtern Button -->
+                    <div class="filterungliste">
+                        <button type="button" class="btn btn-primary">Filtern</button>
+                        <!-- Weitere Filterung Button -->
+                        <button type="button" class="btn btn-link" onclick="showAdditionalFilters()">Weitere Filterung</button>
+                        <!-- Zusätzliche Filteroptionen -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (UserRole == "student")
+            {
+                <div class="row">
+                    <form method="post" action="/Project/ApplyForProject">
+                        @foreach (var item in projectlist)
+                        {
+                            <div class="col-lg-6">
+                                <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">@item.ProjectName</h5>
+                                <div class="row">
+                                    <!-- Linke Spalte für Überschrift und Foto -->
+                                    <div class="col-md-6">
+                                        <div class="rounded overflow-hidden mb-3" style="width: 150px; height: 150px;  background-color: black;">
+                                            <img src="~/logo.png" class="w-100 h-auto" alt="Foto" />
+                                        </div>
+                                    </div>
+                                    <!-- Rechte Spalte für stichpunktartige Informationen -->
+                                    
+                                    <div class="col-md-6">
+                                        <ul>
+                                            <li>Fakultät: @item.Faculty</li>
+                                            <li>Abschluss: @item.Degree</li>
+                                            <li>Erstprüfer: @item.SupervisorName</li>
+                                            <li>Zweitprüfer: @item.SecondSupervisor</li>
+                                            <li>Semesterangebot: @item.Semester</li>
+                                            <li>Sprache: @item.Language</li>
+                                            <li>Art: @item.Type</li>
+                                            <li>Forschungsprojekt: @item.Possibleprojects</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <!-- Beschreibungstext -->
+                                <div class="row">
+                                    <div class="col">
+                                        <p>
+                                            Projektbeschreibung: @item.ProjectDescription
+                                                    
+                                        </p>
+                                        <p>Voraussetzungen : @item.Requirements</p>
+                                         <p>
+                                            Dauer : @item.Duration
+                                        </p>
+                                        <p>Zusätzliche Info: @item.AdditionalInfo</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Buttons -->
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        
+                                        <button type="submit" class="btn btn-primary">Bewerben</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                </form>
+            </div>
+            }
+            @if (UserRole == "teacher")
+            {
+                <div class="row">
+                    
+                        @foreach (var item in projectlist)
+                        {
+                            <!--Anfang liste-->
+                            <div class="col-lg-6">
+                                <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.ProjectName</h5>
+                            <div class="row">
+                                <!-- Linke Spalte für Überschrift und Foto -->
+                                <div class="col-md-6">
+                                    <div class="rounded overflow-hidden mb-3" style="width: 150px; height: 150px;  background-color: black;">
+                                        <img src="~/logo.png" class="w-100 h-auto" alt="Foto" />
+                                    </div>
+                                </div>
+                                <!-- Rechte Spalte für stichpunktartige Informationen -->
+                                <div class="col-md-6">
+                                    <ul>
+                                        <li>Fakultät: @item.Faculty</li>
+                                        <li>Abschluss: @item.Degree</li>
+                                        <li>Erstprüfer: @item.SupervisorName</li>
+                                        <li>Zweitprüfer: @item.SecondSupervisor</li>
+                                        <li>Semesterangebot: @item.Semester</li>
+                                        <li>Sprache: @item.Language</li>
+                                        <li>Art: @item.Type</li>
+                                        <li>Forschungsprojekt: @item.Possibleprojects</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Beschreibungstext -->
+                            <div class="row">
+                                <div class="col">
+                                    <p>
+                                        Projektbeschreibung: @item.ProjectDescription
+                                                    
+                                    </p>
+                                    <p>Voraussetzungen : @item.Requirements</p>
+                                    <p>
+                                        Dauer : @item.Duration
+                                    </p>
+                                    <p>Zusätzliche Information : @item.AdditionalInfo</p>
+                                    
+                                </div>
+                            </div>
+                            
+                            <!-- Buttons -->
+                            
+                        </div>
+                    </div>
+                </div>
+                }
+                
+                <!--Ende Liste-->
+                </div>
+
+    }
+        </div> 
+<script>
+    function showAdditionalFilters() {
+        var additionalFilters = document.getElementById('additionalFilters');
+        if (additionalFilters.style.display === 'none') {
+            additionalFilters.style.display = 'block';
+        } else {
+            additionalFilters.style.display = 'none';
+        }
+    }
+</script>
 
 
 @code {
-    // public List<ProjectModel> projectlist = appData.ProjectViewModel.Projects;
-    // public string UserRole = appData.ProjectViewModel.UserRole;
+    private List<ProjectModel> projectlist;
+    public string? UserRole;
+    public int UserId;
+
+    protected override void OnInitialized()
+    {
+        projectlist = new List<ProjectModel>();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var session = AppDataService.Session;
+        string userId = session.UserId;
+        UserId = Convert.ToInt32(userId);
+        UserRole = session.UserRole;
+
+        if (UserRole == "student")
+            projectlist = await ApiService.GetAllProjects(userId!);
+
+        StateHasChanged();
+
+        // if (UserRole == "teacher")
+        //     projectlist = await ApiService.GetAllProjects(userId!);
+        //     projectlist = RedirectToAction("GetAllProjects", "Project", new { userId = userId.UserId });
+        
+    }
+    
 
 // @model ProjectViewModel
 // @{

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using ApiClient.IoC;
+using MauiBlazor.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace MauiBlazor
 {
@@ -16,6 +18,8 @@ namespace MauiBlazor
 				});
 
 			builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+            //builder.Services.AddAuthorizationCore();
             builder.Services.AddApiClientService(x => x.BaseAddress = "http://10.0.2.2:5172/");
             builder.Services.AddTransient<MainPage>();
             builder.Services.AddSingleton<Services.AppData>();

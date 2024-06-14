@@ -15,7 +15,7 @@ namespace WebAPI.Database
         }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            // Connect to SQL with connection string from app settings
+            // Connect to SQL with connection string from app settings.
             options.UseSqlServer(ConnectionString);
         }
 
@@ -25,5 +25,8 @@ namespace WebAPI.Database
         public DbSet<Project> Projects { get; set; }
 
         public DbSet<Application> Applications { get; set; }
+
+        // Only for mobile app.
+        public DbSet<TokenInfo> TokenInfo { get; set; }
     }
 }

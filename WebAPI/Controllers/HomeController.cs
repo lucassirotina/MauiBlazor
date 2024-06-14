@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using ApiClient.Models.ApiModels;
 using System.Net.Http;
 using ApiClient.Models;
+using WebAPI.UserServices;
 
 namespace WebAPI.Controllers;
 
@@ -17,27 +18,12 @@ namespace WebAPI.Controllers;
 [ApiController]
 public class HomeController : Controller
 {
-    private readonly DataContext _dataContext;
-    //private readonly HttpClient? _httpClient;
-    //private readonly ILogger<HomeController> _logger;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IClientService _service;
 
-    public HomeController(/*ILogger<HomeController> logger,*/ IHttpContextAccessor httpContextAccessor, DataContext dataContext)
+    public HomeController(IClientService service)
     {
-        _dataContext = dataContext;
-        //_logger = logger;
-        _httpContextAccessor = httpContextAccessor;
+        _service = service;
     }
-
-    //public IActionResult Index()
-    //{
-    //    return View();
-    //}
-
-    //public IActionResult Privacy()
-    //{
-    //    return View();
-    //}
 
     //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     //public IActionResult Error()
@@ -47,45 +33,12 @@ public class HomeController : Controller
 
 
     [HttpPost("Login")]
-    [Consumes("application/json")]
-    public IActionResult Anmeldung([FromBody] HomeModel homeModel)
-    {
-        int UserId = homeModel.UserId;
-        string password = homeModel.Password;
-
-        if (password == "" || UserId == null)
-        {
-            //ViewBag.ErrorMessage = "Bitte Passwort und User ID eingeben!";
-            return BadRequest("Bitte Passwort und User ID eingeben!");
-            //return View("Login");
-        }
-
-        using (UnitOfWork unitOfWork = new UnitOfWork())
-        {
-            var userId = unitOfWork.UserRepository.GetUserById(UserId);
-
-            if (userId == null)
-            {              
-                //return View("Login");
-                return BadRequest("Ungültige User ID!");
-            }
-
-            Console.WriteLine(userId);
-            var Password = ApiClient.Models.ApiModels.User.Hash(password, userId.Salt);
-            if (UserId == userId.UserId &&
-                Password == userId.Password)
-            {
-                
-                _httpContextAccessor.HttpContext.Session.SetInt32("UserId", UserId);
-                _httpContextAccessor.HttpContext.Session.SetString("UserRole", userId.Role);
-                if (userId.Role == "student")
-                    return RedirectToAction("GetAllProjects", "Project");
-                if (userId.Role == "teacher")
-                    return RedirectToAction("GetAllProjects", "Project", new { userId = userId.UserId });
-            }
-            
-            return BadRequest("Ungültige User ID oder Passwort!");
-            //return View("Login");
+    //[Consumes("application/json")]
+    public async Task<ActionResult<ServiceResponse>> LoginUserAsync(HomeModel homeModel)
+    {      
+        if (homeModel is null) return BadRequest();
+        var result = await _service.LoginUserAsync(homeModel);
+        return Ok(result);       
         }
     }
 
@@ -221,4 +174,4 @@ public class HomeController : Controller
     //{
     //    return View("ForgotPassword");
     //}
-}
+//}

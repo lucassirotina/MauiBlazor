@@ -1,5 +1,6 @@
 ﻿using ApiClient.Models;
 using ApiClient.Models.ApiModels;
+using System.Net.Http;
 using System.Net.Http.Json;
 
 namespace ApiClient;
@@ -15,9 +16,9 @@ public class ApiClientService
     }
 
     #region Project
-    public async Task<List<Project>?> GetAllProjects()
+    public async Task<List<ProjectModel>> GetAllProjects(string UserId)
     {
-        List<Project>? projects = await _httpClient.GetFromJsonAsync<List<Project>?>("/api/Project");
+        List<ProjectModel> projects = await _httpClient.GetFromJsonAsync<List<ProjectModel>>($"/api/Project/GetAllProjects{UserId}");
         return projects;
     }
 
@@ -48,16 +49,11 @@ public class ApiClientService
         return await _httpClient.GetFromJsonAsync<User?>($"/api/User/{id}");
     }
 
-    public async Task<List<ProjectModel>?> Login(int userId, string password)
+    public async Task<ServiceResponse> LoginUserAsync(int userId, string password)
     {
-        var response = await _httpClient.PostAsJsonAsync("/api/Home/Login", new HomeModel( userId, password ));
-        if (response.IsSuccessStatusCode)
-        {
-            var projects = await response.Content.ReadFromJsonAsync<List<ProjectModel>>();
-            return projects;
-        }
-        
-        return new List<ProjectModel>();
+        var result = await _httpClient.PostAsJsonAsync("/api/Home/Login", new HomeModel(userId, password));
+        var response = await result.Content.ReadFromJsonAsync<ServiceResponse>();
+        return response!;
     }
     #endregion
 }

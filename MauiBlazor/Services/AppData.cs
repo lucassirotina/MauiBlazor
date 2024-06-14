@@ -1,13 +1,8 @@
-﻿using ApiClient.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MauiBlazor.Authentication;
 
 namespace MauiBlazor.Services;
 
 public class AppData
 {
-    public ProjectViewModel ProjectViewModel { get; set; }
+    public UserSession Session { get; set; }
 }

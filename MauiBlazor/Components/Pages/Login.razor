@@ -1,22 +1,25 @@
 ﻿@page "/"
-
+@using MauiBlazor.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.IdentityModel.Tokens.Jwt
+@using System.Security.Claims
 @using ApiClient.Models
 @using ApiClient
-@inject ApiClient.ApiClientService ApiService
+@inject ApiClientService ApiService
+@inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager Navigation
-@inject Services.AppData AppData
+@inject Services.AppData AppDataService
 
 <div class="row justify-content-center my-4">
     <div class="col-auto">
-        <img src=logo.png alt="Firmenlogo" />
-        @* <img src="logo.png" alt="Firmenlogo" class="img-fluid"> *@
+        <img src="Images/logo.png" alt="Firmenlogo" />
     </div>
 </div>
 <div class="container">
     <div class="row justify-content-center align-items-center" >
         <div class="card">
             <div class="card-body">
-                <EditForm Model="@homeModel" OnValidSubmit="@Submit">
+                <EditForm Model="@homeModel" OnValidSubmit="@HandleLogin">
                     <DataAnnotationsValidator />
                     <h1 class="card-title text-center"> Willkommen </h1>
                     <h3 class="card-title text-center"> Login </h3>
@@ -30,7 +33,7 @@
                         <input type="password" @bind-value="homeModel.Password" class="form-control">
                         <ValidationMessage For="@(() => homeModel.Password)" />
                     </div>
-                    <br /> @* Zeilenumbruch *@
+                    <br /> @* Line break. *@
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block btn-login"> Einloggen </button>
                     </div>
@@ -57,29 +60,40 @@
 @code {
     HomeModel homeModel = new();
 
-    private async void Submit()
+    private async void HandleLogin()
     {
-        try
+        var response = await ApiService.LoginUserAsync(homeModel.UserId, homeModel.Password!);
+        if (response.Flag)
         {
-            var projects = await ApiService.Login(homeModel.UserId, homeModel.Password!);
-            if (projects == null)
-			{
-				Console.WriteLine("Fehler beim Login");
-				return;
-			}
-            AppData.ProjectViewModel = new ProjectViewModel(projects!);
-            Navigation.NavigateTo("feed");
+            // Save the token, decrypt and get user claims and save to secured storage.
+            var getUserSession = GetUserClaims(response.Token);
+            if (getUserSession == null) return;
+
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(getUserSession);
+            //await Application.Current.MainPage.DisplayAlert("Info", response.Token, "Ok");
+            AppDataService.Session = getUserSession;
+            Navigation.NavigateTo("/feed", forceLoad: true, replace: true);
+            homeModel = new HomeModel();
         }
-        catch (HttpRequestException ex)
+        else
         {
-            Console.WriteLine($"Ein HTTP-Fehler ist aufgetreten: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Ein unerwarteter Fehler ist aufgetreten: {ex.Message}");
+            await Application.Current.MainPage.DisplayAlert("Info", response.Message, "Ok");
+            return;
         }
     }
 
-    // var httpContextAccessor = Context.RequestServices.GetService(typeof(IHttpContextAccessor)) as IHttpContextAccessor;
-    // var user = httpContextAccessor.HttpContext.Session.GetInt32("UserId");
+    private UserSession GetUserClaims(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var readToken = handler.ReadJwtToken(token);
+        var claims = readToken.Claims;
+
+        return new UserSession()
+            {
+                UserId = claims.First(_ => _.Type == ClaimTypes.NameIdentifier).Value,
+                UserRole = claims.First(_ => _.Type == ClaimTypes.Role).Value,
+                Token = token
+            };
+    }
 }
