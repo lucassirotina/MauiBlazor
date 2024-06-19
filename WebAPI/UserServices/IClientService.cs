@@ -4,6 +4,6 @@ namespace WebAPI.UserServices;
 
 public interface IClientService
 {
-    //Task<ServiceResponse> RegisterUserAsync(Registration model);
+    ServiceResponse RegisterUser(RegistrationModel model);
     Task<ServiceResponse> LoginUserAsync(HomeModel model);
 }

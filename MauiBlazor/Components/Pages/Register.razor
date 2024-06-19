@@ -1,0 +1,159 @@
+﻿@page "/register"
+@using ApiClient
+@using ApiClient.Models
+@using Microsoft.AspNetCore.Components.Forms
+@inject ApiClientService ApiService
+@inject NavigationManager Navigation
+
+<!-- Logo Bereich -->
+<div class="row justify-content-center my-4">
+    <div class="col-auto">
+        <img src="/Images/logo.png" alt="Firmenlogo" class="img-fluid">
+    </div>
+</div>
+
+<!-- Registrierung Bereich -->
+<div class="container">
+<div class="row justify-content-center align-items-center" style="height:100vh;">
+    <div class="col-6">
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="@registrationModel" OnValidSubmit="@HandleRegister">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                        <!-- Radio Buttons -->
+                        <div class="mb-3">
+                            <label class="form-check-label">
+                                <input type="radio" @bind="@(registrationModel.UserType = student)" class="form-check-input" name="userType" onclick="toggleFields('student')"> Student
+                            </label>
+                            <label class="form-check-label">
+                                <input type="radio" name="userType" @bind="@(registrationModel.UserType = teacher)" class="form-check-input" onclick="toggleFields('teacher')" /> Lehrer
+                            </label>
+                        </div>
+                    
+                        <div id="studentFields" style="display: none;">
+                            <h2>Student</h2>
+                            <div class="form-group">
+                                <label>Studiengang:</label>
+                                <input type="text" @bind-value="registrationModel.Studiengang" class="form-control" name="studiengang">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Studienabschluss:</label>
+                                <input type="text" @bind-value="registrationModel.Studienabschluss" class="form-control" name="studienabschluss">
+                            </div>
+                            <div class="form-group">
+                                <label>Semester:</label>
+                                <input type="text" @bind-value="registrationModel.Semester" class=" form-control" name="semester">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Matrikelnummer:</label>
+                                <input type="text" @bind-value="registrationModel.Matrikelnummer" class="form-control" name="matrikelnummer">
+                            </div>
+                        </div>
+
+                        <div id="teacherFields" style="display: none;">
+                            <h2>Lehrer</h2>
+                            <div class="form-group">
+                                <label>Lehrstuhl:</label>
+                                <input type="text" @bind-value="registrationModel.Lehrstuhl" class="form-control" name="lehrstuhl">
+                            </div>
+                            <div class="form-group">
+                                <label>Position:</label>
+                                <input type="text" @bind-value="registrationModel.Position" class="form-control" name="position">
+                            </div>
+                            <div class="form-group">
+                                <label>Raumnummer:</label>
+                                <input type="text" @bind-value="registrationModel.Raumnummer" class="form-control" name="raumnummer">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mitarbeiter Nr.:</label>
+                                <input type="text" @bind-value="registrationModel.MitarbeiterNr" class="form-control" name="mitarbeiterNr">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Vorname:</label>
+                            <input type="text" @bind-value="registrationModel.Vorname" class="form-control" name="vorname">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nachname:</label>
+                            <input type="text" @bind-value="registrationModel.Nachname" class="form-control" name="nachname">
+                        </div>
+                        <div class="form-group">
+                            <label>Fakultät:</label>
+                            <select @bind="registrationModel.Fakultaet" class="form-control" name="fakultaet">
+                                <option value="Fakultaet1">Fakultät 1</option>
+                                <option value="Fakultaet2">Fakultät 2</option>
+                                <option value="Fakultaet3">Fakultät 3</option>
+                                <option value="Fakultaet4">Fakultät 4</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" @bind-value="registrationModel.Email" class="form-control" name="email">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email wiederholen:</label>
+                            <input type="email" @bind-value="registrationModel.EmailRepeat" class="form-control" name="emailRepeat">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Passwort:</label>
+                            <input type="password" @bind-value="registrationModel.Password" class="form-control" name="password">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Passwort wiederholen:</label>
+                            <input type="password" @bind-value="registrationModel.PasswordRepeat" class="form-control" name="passwordRepeat">
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="termsAgree">
+                            <label class="form-check-label">Nutzungsbedingungen zustimmen</label>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary mt-3">Registrieren</button>
+                        </div>
+                </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function toggleFields(userType) {
+        if (userType === 'student') {
+            document.getElementById('studentFields').style.display = 'block';
+            document.getElementById('teacherFields').style.display = 'none';
+        } else if (userType === 'teacher') {
+            document.getElementById('studentFields').style.display = 'none';
+            document.getElementById('teacherFields').style.display = 'block';
+        }
+    }
+</script>
+
+@code {
+    private RegistrationModel registrationModel { get; set; } = new();
+    string student = "student";
+    string teacher = "teacher";
+    
+    private async void HandleRegister()
+    {
+        var serviceResponse = await ApiService.RegisterUserAsync(registrationModel);
+        if (serviceResponse.Flag)
+        {
+            await Application.Current.MainPage.DisplayAlert("Success", serviceResponse.Message, "Ok");
+            Navigation.NavigateTo("/", replace: true);
+            registrationModel = new RegistrationModel();
+        }
+        else
+        {
+            await Application.Current.MainPage.DisplayAlert("Alert", serviceResponse.Message, "Ok");
+            return;
+        }
+    }
+}

@@ -55,5 +55,12 @@ public class ApiClientService
         var response = await result.Content.ReadFromJsonAsync<ServiceResponse>();
         return response!;
     }
+
+    public async Task<ServiceResponse> RegisterUserAsync(RegistrationModel model)
+    {
+        var result = await _httpClient.PostAsJsonAsync("/api/Home/Register", model);
+        var response = await result.Content.ReadFromJsonAsync<ServiceResponse>();
+        return response!;
+    }
     #endregion
 }

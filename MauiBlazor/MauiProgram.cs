@@ -2,6 +2,7 @@
 using ApiClient.IoC;
 using MauiBlazor.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Globalization;
 
 namespace MauiBlazor
 {
@@ -28,8 +29,10 @@ namespace MauiBlazor
             builder.Services.AddBlazorWebViewDeveloperTools();
 			builder.Logging.AddDebug();
 #endif
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("de-DE");
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("de-DE");
 
-			return builder.Build();
+            return builder.Build();
 		}
 	}
 }

@@ -26,13 +26,11 @@
                     <div class="form-group">
                         <label for="username"> Benutzername </label>
                         <input type="text" @bind-value="homeModel.UserId" class="form-control" placeholder="MatrikelNr/MitarbeiterNr eingeben">
-                        <ValidationMessage For="@(() => homeModel.UserId)" />
                     </div>
                     <div class="form-group">
                         <label for="password">Passwort</label>
                         <input type="password" @bind-value="homeModel.Password" class="form-control">
-                        <ValidationMessage For="@(() => homeModel.Password)" />
-                    </div>
+                    </div>                   
                     <br /> @* Line break. *@
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block btn-login"> Einloggen </button>
@@ -46,7 +44,7 @@
                         </div>
                         <div class="text-center mt-2">
                             Noch kein Konto? 
-                            <NavLink class="nav-link" href="registration"> 
+                            <NavLink class="nav-link" href="register"> 
                                 <span> Hier registrieren </span>
                             </NavLink>
                         </div>

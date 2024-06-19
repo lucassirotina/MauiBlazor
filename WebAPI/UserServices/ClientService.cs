@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using WebAPI.Database;
 using ApiClient.Models.ApiModels;
+using WebAPI.Database.Repository;
 
 namespace WebAPI.UserServices;
 
@@ -17,6 +18,75 @@ public class ClientService : IClientService
     {
         this.appDbContext = appDbContext;
         this.config = config;
+    }
+
+    public ServiceResponse RegisterUser(RegistrationModel model)
+    {
+        string userType = model.UserType;
+        string password = model.Password;
+        string passwordRepeat = model.PasswordRepeat;
+        string email = model.Email;
+        string emailRepeat = model.EmailRepeat;
+
+        if (model.Password == null || model.PasswordRepeat == null || model.Email == null ||
+            model.EmailRepeat == null || model.UserType == null || model.Nachname == null ||
+            model.Vorname == null || model.Fakultaet == null ||
+            (model.UserType == "student" && (model.Matrikelnummer == null || model.Studiengang == null ||
+            model.Studienabschluss == null || model.Semester == null)) ||
+            (model.UserType == "teacher" && (model.MitarbeiterNr == null || model.Position == null ||
+            model.Lehrstuhl == null || model.Raumnummer == null)))
+        {
+            return new ServiceResponse() { Flag = false, Message = "Bitte füllen Sie alle Felder aus!" };
+        }
+
+        if (password.Length < 8)
+        {
+            return new ServiceResponse() { Flag = false, Message = "Das Passwort muss mindestens 8 Zeichen lang sein!" };
+        }
+
+        if (password != passwordRepeat)
+        {
+            return new ServiceResponse() { Flag = false, Message = "Das wiederholte Passwort ist falsch!" };
+        }
+
+        if (email != emailRepeat)
+        {
+            return new ServiceResponse() { Flag = false, Message = "Die wiederholte E-Mail ist falsch!" };
+        }
+
+        int userId = 0;
+
+        using (UnitOfWork unitOfWork = new())
+        {
+            if (userType == "student")
+            {
+                userId = model.Matrikelnummer;
+            }
+            else if (userType == "teacher")
+            {
+                userId = model.MitarbeiterNr;
+            }
+
+            User addUser = new User(model.Nachname + "," + model.Vorname, userId, password, email, userType);
+            IUserRepository user = unitOfWork.UserRepository;
+            user.CreateUser(addUser);
+
+            if (userType == "student")
+            {
+                Student addStudent = new Student(model.Matrikelnummer, model.Studiengang, model.Studienabschluss, model.Semester, model.Nachname, model.Vorname, model.Fakultaet);
+                IStudentRepository student = unitOfWork.StudentRepository;
+                student.CreateStudent(addStudent);
+            }
+            else if (userType == "teacher")
+            {
+                userId = model.MitarbeiterNr;
+                Supervisor addLehrender = new Supervisor(model.MitarbeiterNr, model.Position, model.Lehrstuhl, model.Nachname, model.Vorname, model.Fakultaet, model.Raumnummer);
+                ILehrenderRepository lehrender = unitOfWork.LehrenderRepository;
+                lehrender.CreateSupervisor(addLehrender);
+            }
+            unitOfWork.Save();
+            return new ServiceResponse() { Flag = true, Message = "Benutzer erfolgreich registriert!" };
+        }
     }
 
     public async Task<ServiceResponse> LoginUserAsync(HomeModel model)
